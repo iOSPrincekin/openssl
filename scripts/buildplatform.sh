@@ -12,13 +12,13 @@ echo Architecture is ${ARCHITECTURE}
 
 if [ "$PLATFORM" = "iOS" ]; then 
     echo "build for iOS platform..."
-	TARGET="ios-cross"
+	TARGET="ios64-cross"
 	export CROSS_TOP="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer"
 	export CROSS_SDK="iPhoneOS.sdk"
 	export CROSS_COMPILE=`xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/bin/
 	TOOLCHAIN_ROOT="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain"
-
-	../Configure $TARGET "-arch $ARCHITECTURE -fembed-bitcode" no-asm no-shared no-hw no-async --prefix=${BASEDIR}/../install/${PLATFORM}/${ARCHITECTURE} || exit 1 
+    rm -rf ${BASEDIR}/../install/${PLATFORM}/${ARCHITECTURE}
+	../Configure $TARGET "-arch $ARCHITECTURE " no-asm no-shared no-hw no-async --prefix=${BASEDIR}/../install/${PLATFORM}/${ARCHITECTURE} || exit 1 
 
 elif [ "$PLATFORM" = "Android" ]; then 
     echo "build for Android platform..."
