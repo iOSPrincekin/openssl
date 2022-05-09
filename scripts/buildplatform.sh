@@ -1,39 +1,32 @@
 #!/bin/bash
-ARCHITECTURE=${1}
+
+BASEDIR=$(dirname "$0")
+cd ${BASEDIR}
+BASEDIR=`pwd`
+
+ARCHITECTURE=${2}
+
+PLATFORM=${1}
 
 echo Architecture is ${ARCHITECTURE}
 
-if [[ ${ARCHITECTURE} = "i386" || ${ARCHITECTURE} = "x86_64"  ]]; then
-    TARGET="iossimulator-xcrun"
-else
-    TARGET="ios-cross"
-    export CROSS_TOP="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer"
-    export CROSS_SDK="iPhoneOS.sdk"
-    export CROSS_COMPILE=`xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/bin/
-    TOOLCHAIN_ROOT="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain"
-fi
+if [ "$PLATFORM" = "iOS" ]; then 
+    echo "build for iOS platform..."
+	TARGET="ios-cross"
+	export CROSS_TOP="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer"
+	export CROSS_SDK="iPhoneOS.sdk"
+	export CROSS_COMPILE=`xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/bin/
+	TOOLCHAIN_ROOT="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain"
 
-./Configure $TARGET "-arch $ARCHITECTURE -fembed-bitcode" no-asm no-shared no-hw no-async --prefix=$(pwd)/${ARCHITECTURE}_install || exit 1 
+	../Configure $TARGET "-arch $ARCHITECTURE -fembed-bitcode" no-asm no-shared no-hw no-async --prefix=${BASEDIR}/../install/${PLATFORM}/${ARCHITECTURE} || exit 1 
+
+elif [ "$PLATFORM" = "Android" ]; then 
+    echo "build for Android platform..."
+else
+    echo "unknown platform!!!"
+fi;
 
 export PATH=${TOOLCHAIN_ROOT}/usr/bin:$PATH
-make && make install || exit 2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+make -j4 && make install || exit 2
 
 echo buildplatform.sh done
